@@ -1,0 +1,81 @@
+{% extends 'grades/base.html' %}
+{% block title %}دفتر نمره — {{ student.full_name }}{% endblock %}
+{% block content %}
+  <div class="panel" style="max-width:900px; margin:0 auto;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h4 style="margin:0">دفتر نمره — {{ student.full_name }}</h4>
+        <div class="text-muted small">کلاس: {{ class.name }} — شماره: {{ student.roll_number }}</div>
+      </div>
+      <div>
+        <a class="btn btn-secondary" href="{% url 'grades:class_detail' class_id=class.id %}">بازگشت</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h5>اضافه کردن ورودی جدید</h5>
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="text-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <div class="mb-2">{{ form.subject.label_tag }}{{ form.subject }}{% if form.subject.errors %}<div class="text-danger small">{{ form.subject.errors }}</div>{% endif %}</div>
+          <div class="mb-2">{{ form.entry_type.label_tag }}{{ form.entry_type }}{% if form.entry_type.errors %}<div class="text-danger small">{{ form.entry_type.errors }}</div>{% endif %}</div>
+          <div class="mb-2">{{ form.value.label_tag }}{{ form.value }}{% if form.value.errors %}<div class="text-danger small">{{ form.value.errors }}</div>{% endif %}</div>
+          <div class="mb-2">{{ form.date.label_tag }}{{ form.date }}{% if form.date.errors %}<div class="text-danger small">{{ form.date.errors }}</div>{% endif %}</div>
+          <div class="mb-2">{{ form.notes.label_tag }}{{ form.notes }}{% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors }}</div>{% endif %}</div>
+          <button class="btn btn-primary">افزودن</button>
+        </form>
+      </div>
+
+      <div class="col-md-6">
+        <h5>ورودی‌های قبلی</h5>
+        {% if entries %}
+          <ul class="list-group">
+            {% for e in entries %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <div style="font-weight:700">{{ e.get_entry_type_display }} {% if e.value %}— {{ e.value }}{% endif %} — <small class="text-muted">{{ e.subject.name }}</small></div>
+                  <div class="text-muted small">{% if e.date_jalali %}{{ e.date_jalali }}{% else %}{{ e.date }}{% endif %} — {{ e.notes }}</div>
+                </div>
+                <div class="d-flex gap-2">
+                  <a class="btn btn-sm btn-outline-secondary" href="{% url 'grades:edit_gradebook_entry' e.id %}">ویرایش</a>
+                  <form method="post" action="{% url 'grades:delete_gradebook_entry' e.id %}" onsubmit="return confirm('آیا حذف شود؟');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger">حذف</button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">هیچ ورودی‌ای ثبت نشده است.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/behrangja/persian-datepicker@v1.2.0/dist/css/persian-datepicker.min.css" />
+  <script src="https://cdn.jsdelivr.net/gh/behrangja/persian-datepicker@v1.2.0/dist/js/persian-date.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/behrangja/persian-datepicker@v1.2.0/dist/js/persian-datepicker.min.js"></script>
+  <script>
+    $(function(){
+      $('.persian-date').each(function(){
+        $(this).persianDatepicker({
+          format: 'YYYY/MM/DD',
+          initialValue: false,
+          autoClose: true
+        });
+      });
+    });
+  </script>
+{% endblock %}

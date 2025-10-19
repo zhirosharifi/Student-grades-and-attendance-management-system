@@ -1,0 +1,18 @@
+{% extends 'grades/base.html' %}
+{% block title %}ایجاد کلاس{% endblock %}
+{% block content %}
+  <div class="panel" style="max-width:700px; margin:0 auto;">
+    <h4>ایجاد کلاس جدید</h4>
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+      <div class="col-12">
+        {{ form.name.label_tag }}
+        {{ form.name }}
+      </div>
+      <div class="col-12 d-flex justify-content-between">
+        <a class="btn btn-secondary" href="{% url 'grades:dashboard' %}">بازگشت</a>
+        <button class="btn btn-primary">ساخت کلاس</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

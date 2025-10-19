@@ -1,0 +1,56 @@
+{% extends 'grades/base.html' %}
+{% block title %}مدیریت دروس — {{ class.name }}{% endblock %}
+{% block content %}
+  <div class="panel" style="max-width:900px; margin:0 auto;">
+    <h4>مدیریت دروس کلاس «{{ class.name }}»</h4>
+
+    <div class="mb-3">
+      <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        {{ form.name }}
+        <button class="btn btn-primary">افزودن درس</button>
+      </form>
+    </div>
+
+    {% if subjects %}
+      <table class="table table-striped">
+        <thead>
+          <tr><th>#</th><th>نام درس</th><th>اقدامات</th></tr>
+        </thead>
+        <tbody>
+          {% for subj in subjects %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <div style="font-weight:700">{{ subj.name }}</div>
+              <div class="text-muted small">معلم: {{ subj.teacher_name|default:'—' }}</div>
+            </td>
+            <td class="d-flex gap-2">
+              <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="rename">
+                <input type="hidden" name="subject_id" value="{{ subj.id }}">
+                <input name="new_name" class="form-control form-control-sm" placeholder="نام جدید">
+                <input name="new_teacher" class="form-control form-control-sm mt-1" placeholder="نام معلم جدید (اختیاری)">
+                <button class="btn btn-sm btn-outline-secondary mt-1">ویرایش</button>
+              </form>
+
+              <form method="post" style="display:inline" onsubmit="return confirm('آیا از حذف این درس مطمئن هستید؟');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="subject_id" value="{{ subj.id }}">
+                <button class="btn btn-sm btn-outline-danger">حذف</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="alert alert-info">هیچ درسی برای این کلاس ثبت نشده است.</div>
+    {% endif %}
+
+    <a class="btn btn-secondary" href="{% url 'grades:class_detail' class_id=class.id %}">بازگشت به کلاس</a>
+  </div>
+{% endblock %}

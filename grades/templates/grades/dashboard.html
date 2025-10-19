@@ -1,0 +1,37 @@
+{% extends 'grades/base.html' %}
+{% block title %}داشبورد{% endblock %}
+{% block content %}
+  <div class="panel mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <h4 style="margin:0">کلاس‌های من</h4>
+        <div class="text-muted small">کلاس‌هایی که تعریف کرده‌اید</div>
+      </div>
+      <div>
+        <a class="btn btn-success" href="{% url 'grades:add_class' %}">+ ایجاد کلاس جدید</a>
+      </div>
+    </div>
+
+    {% if classes %}
+      <div class="list-group">
+        {% for c in classes %}
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div style="font-weight:700">{{ c.name }}</div>
+              <div class="text-muted small">دروس: {{ c.subjects.count }} — دانش‌آموزان: {{ c.students.count }} — معدل کل کلاس: {{ c.average|default:"۰" }}</div>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <a class="btn btn-sm btn-primary" href="{% url 'grades:class_detail' class_id=c.id %}">مشاهده</a>
+              <form method="post" action="{% url 'grades:delete_class' class_id=c.id %}" onsubmit="return confirm('آیا از حذف این کلاس مطمئن هستید؟ حذف تمام دانش‌آموزان و نمرات انجام می‌شود.');">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger">حذف</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-4 text-muted">هیچ کلاسی وجود ندارد. یک کلاس ایجاد کنید.</div>
+    {% endif %}
+  </div>
+{% endblock %}

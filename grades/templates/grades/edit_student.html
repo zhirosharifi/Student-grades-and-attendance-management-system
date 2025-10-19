@@ -1,0 +1,16 @@
+{% extends 'grades/base.html' %}
+{% block title %}ویرایش دانش‌آموز — {{ student.full_name }}{% endblock %}
+{% block content %}
+  <div class="panel" style="max-width:720px; margin:0 auto;">
+    <h4 style="margin:0 0 12px 0;">ویرایش دانش‌آموز</h4>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary">ذخیره</button>
+        <a class="btn btn-outline-secondary" href="{% url 'grades:class_detail' class_id=class.id %}">انصراف</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+

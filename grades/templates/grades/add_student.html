@@ -1,0 +1,73 @@
+{% extends 'grades/base.html' %}
+{% block title %}افزودن دانش‌آموز — {{ class.name }}{% endblock %}
+{% block content %}
+  <div class="panel" style="max-width:800px; margin:0 auto;">
+    <h4>افزودن دانش‌آموز به «{{ class.name }}»</h4>
+    <p class="text-muted">اگر برای این کلاس هنوز درسی ندارید، می‌توانید لیست دروس را (با کاما) در پایین وارد کنید تا برای کل کلاس ثبت شود.</p>
+
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="col-12">
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        </div>
+      {% endif %}
+      <div class="col-md-6">
+        {{ form.full_name.label_tag }}
+        {{ form.full_name }}
+        {% if form.full_name.errors %}<div class="text-danger small">{{ form.full_name.errors }}</div>{% endif %}
+      </div>
+      <div class="col-md-6">
+        {{ form.roll_number.label_tag }}
+        {{ form.roll_number }}
+        {% if form.roll_number.errors %}<div class="text-danger small">{{ form.roll_number.errors }}</div>{% endif %}
+      </div>
+
+      <div class="col-md-6">
+        {{ form.national_id.label_tag }}
+        {{ form.national_id }}
+        {% if form.national_id.errors %}<div class="text-danger small">{{ form.national_id.errors }}</div>{% endif %}
+      </div>
+      <div class="col-md-6"></div>
+
+      <div class="col-md-4">
+        {{ form.phone1.label_tag }}
+        {{ form.phone1 }}
+        {% if form.phone1.errors %}<div class="text-danger small">{{ form.phone1.errors }}</div>{% endif %}
+      </div>
+      <div class="col-md-4">
+        {{ form.phone2.label_tag }}
+        {{ form.phone2 }}
+        {% if form.phone2.errors %}<div class="text-danger small">{{ form.phone2.errors }}</div>{% endif %}
+      </div>
+      <div class="col-md-4">
+        {{ form.phone3.label_tag }}
+        {{ form.phone3 }}
+        {% if form.phone3.errors %}<div class="text-danger small">{{ form.phone3.errors }}</div>{% endif %}
+      </div>
+
+      <div class="col-md-6">
+        {{ form.email1.label_tag }}
+        {{ form.email1 }}
+        {% if form.email1.errors %}<div class="text-danger small">{{ form.email1.errors }}</div>{% endif %}
+      </div>
+      <div class="col-md-6">
+        {{ form.email2.label_tag }}
+        {{ form.email2 }}
+        {% if form.email2.errors %}<div class="text-danger small">{{ form.email2.errors }}</div>{% endif %}
+      </div>
+
+      {% if class.subjects.count == 0 %}
+        <div class="col-12">
+          <label class="form-label">دروس کلاس (در صورت وجود نداشتن دروس، وارد کنید)</label>
+          <textarea name="initial_subjects" class="form-control" placeholder="مثال: ریاضی، فیزیک، شیمی"></textarea>
+        </div>
+      {% endif %}
+
+      <div class="col-12 d-flex justify-content-between">
+        <a class="btn btn-secondary" href="{% url 'grades:class_detail' class_id=class.id %}">بازگشت</a>
+        <button class="btn btn-primary">افزودن دانش‌آموز</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

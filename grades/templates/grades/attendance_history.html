@@ -1,0 +1,48 @@
+{% extends 'grades/base.html' %}
+{% block title %}تاریخچه حضور/غیاب{% endblock %}
+{% block content %}
+  <div class="panel">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h4 style="margin:0">تاریخچه حضور/غیاب</h4>
+      <form method="post" action="{% url 'grades:clear_attendance_history' %}" onsubmit="return confirm('کل تاریخچه حضور/غیاب حذف شود؟');">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger">حذف کل تاریخچه</button>
+      </form>
+    </div>
+    <form method="get" class="row g-2 mb-3">
+      <div class="col-md-6"><input type="text" class="form-control" name="q" placeholder="جستجو نام/کد ملی" value="{{ request.GET.q }}"></div>
+      <div class="col-md-3">
+        <select class="form-control" name="present">
+          <option value="">همه وضعیت‌ها</option>
+          <option value="1" {% if request.GET.present == '1' %}selected{% endif %}>حاضر</option>
+          <option value="0" {% if request.GET.present == '0' %}selected{% endif %}>غایب</option>
+        </select>
+      </div>
+      <div class="col-md-3"><button class="btn btn-primary w-100">فیلتر</button></div>
+    </form>
+
+    {% if items %}
+      <table border="1" cellpadding="5" style="width:100%">
+        <tr>
+          <th>#</th>
+          <th>دانش‌آموز</th>
+          <th>تاریخ</th>
+          <th>وضعیت</th>
+          <th>زمان آرشیو</th>
+        </tr>
+        {% for it in items %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ it.student.full_name }} ({{ it.student.roll_number }})</td>
+          <td>{% if it.date_jalali %}{{ it.date_jalali }}{% else %}{{ it.date }}{% endif %}</td>
+          <td>{% if it.present %}حاضر{% else %}غایب{% endif %}</td>
+          <td>{{ it.archived_at }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <div class="text-muted">موردی یافت نشد.</div>
+    {% endif %}
+  </div>
+{% endblock %}
+

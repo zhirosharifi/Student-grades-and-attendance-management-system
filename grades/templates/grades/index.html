@@ -1,0 +1,19 @@
+{% extends 'grades/base.html' %}
+{% block content %}
+    <h1>محاسبه معدل دانش‌آموز</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">محاسبه</button>
+    </form>
+
+    {% if result %}
+        <h2>معدل: {{ result }}</h2>
+        {% if congrat %}
+            <p style="color: #00ff7f; font-size: 20px;">🎉 تبریک! معدل شما عالی است! 🎉</p>
+        {% else %}
+            <p style="color: #ffeb3b;">🙂 تلاش خود را بیشتر کن!</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

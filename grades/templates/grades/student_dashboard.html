@@ -1,0 +1,211 @@
+{% extends 'grades/base.html' %}
+
+{% block title %}داشبورد دانش‌آموز{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>داشبورد دانش‌آموز</h2>
+                <div>
+                    <span class="badge bg-info me-2">{{ student.full_name }}</span>
+                    <span class="badge bg-secondary me-2">{{ student.classroom.name }}</span>
+                    <a href="{% url 'grades:student_logout' %}" class="btn btn-outline-danger btn-sm">خروج</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Info Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">اطلاعات دانش‌آموز</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>نام و نام خانوادگی:</strong><br>
+                            {{ student.full_name }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>شماره دانش‌آموزی:</strong><br>
+                            {{ student.roll_number }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>کلاس:</strong><br>
+                            {{ student.classroom.name }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>معدل کل:</strong><br>
+                            {% if student_average %}
+                                <span class="badge bg-success fs-6">{{ student_average }}</span>
+                            {% else %}
+                                <span class="text-muted">هنوز نمره‌ای ثبت نشده</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Grades Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">نمرات</h5>
+                </div>
+                <div class="card-body">
+                    {% if grades %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>درس</th>
+                                        <th>نمره</th>
+                                        <th>وضعیت</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for grade in grades %}
+                                        <tr>
+                                            <td>{{ grade.subject.name }}</td>
+                                            <td>
+                                                <span class="badge {% if grade.score >= 12 %}bg-success{% elif grade.score >= 10 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    {{ grade.score }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if grade.score >= 12 %}
+                                                    <span class="text-success">قبول</span>
+                                                {% elif grade.score >= 10 %}
+                                                    <span class="text-warning">مشروط</span>
+                                                {% else %}
+                                                    <span class="text-danger">مردود</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">هنوز نمره‌ای ثبت نشده است.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">حضور و غیاب</h5>
+                </div>
+                <div class="card-body">
+                    {% if attendances %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>تاریخ</th>
+                                        <th>وضعیت</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for attendance in attendances|slice:":10" %}
+                                        <tr>
+                                            <td>{{ attendance.date_jalali|default:attendance.date }}</td>
+                                            <td>
+                                                {% if attendance.present %}
+                                                    <span class="badge bg-success">حاضر</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">غایب</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if attendances.count > 10 %}
+                            <small class="text-muted">نمایش ۱۰ مورد آخر از {{ attendances.count }} رکورد</small>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">هنوز رکورد حضور و غیابی ثبت نشده است.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gradebook Entries Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">دفتر نمره</h5>
+                </div>
+                <div class="card-body">
+                    {% if gradebook_entries %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>تاریخ</th>
+                                        <th>درس</th>
+                                        <th>نوع</th>
+                                        <th>مقدار</th>
+                                        <th>توضیحات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entry in gradebook_entries|slice:":15" %}
+                                        <tr>
+                                            <td>{{ entry.date_jalali|default:entry.date }}</td>
+                                            <td>{{ entry.subject.name|default:"-" }}</td>
+                                            <td>
+                                                {% if entry.entry_type == 'pos' %}
+                                                    <span class="badge bg-success">مثبت</span>
+                                                {% elif entry.entry_type == 'neg' %}
+                                                    <span class="badge bg-danger">منفی</span>
+                                                {% elif entry.entry_type == 'num' %}
+                                                    <span class="badge bg-primary">نمره</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if entry.value %}
+                                                    {% if entry.entry_type == 'pos' %}
+                                                        +{{ entry.value }}
+                                                    {% elif entry.entry_type == 'neg' %}
+                                                        -{{ entry.value }}
+                                                    {% else %}
+                                                        {{ entry.value }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ entry.notes|default:"-" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if gradebook_entries.count > 15 %}
+                            <small class="text-muted">نمایش ۱۵ مورد آخر از {{ gradebook_entries.count }} رکورد</small>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">هنوز ورودی‌ای در دفتر نمره ثبت نشده است.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

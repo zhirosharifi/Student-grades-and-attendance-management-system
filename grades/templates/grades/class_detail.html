@@ -1,0 +1,87 @@
+{% extends 'grades/base.html' %}
+{% load grade_extras %}
+{% load static %}
+{% block content %}
+<h2>جزئیات کلاس: {{ class.name }}</h2>
+
+<div style="margin:10px 0;">
+  <a class="btn btn-primary" href="{% url 'grades:add_student' class_id=class.id %}">افزودن دانش‌آموز</a>
+  <a class="btn btn-outline-secondary" href="{% url 'grades:manage_subjects' class_id=class.id %}">ویرایش/مدیریت دروس</a>
+  <a class="btn btn-outline-success" href="{% url 'grades:mark_attendance' class_id=class.id %}">ثبت حضور</a>
+  <a class="btn btn-outline-info" href="{% url 'grades:attendance_history' %}">تاریخچه حضور/غیاب</a>
+  <a class="btn btn-outline-info" href="{% url 'grades:gradebook_history' %}">تاریخچه دفتر نمره</a>
+  <form method="post" action="{% url 'grades:reset_attendance' class_id=class.id %}" style="display:inline" onsubmit="return confirm('لیست حضور/غیاب ریست شود؟')">
+    {% csrf_token %}
+    <button class="btn btn-outline-warning">ریست حضور/غیاب</button>
+  </form>
+  <form method="post" action="{% url 'grades:reset_gradebook' class_id=class.id %}" style="display:inline" onsubmit="return confirm('دفتر نمره ریست شود؟')">
+    {% csrf_token %}
+    <button class="btn btn-outline-warning">ریست دفتر نمره</button>
+  </form>
+</div>
+
+<table border="1" cellpadding="5">
+  <tr>
+    <th>شماره</th>
+    <th>نام دانش‌آموز</th>
+    <th>میانگین نمرات</th>
+    <th>اقدامات</th>
+  </tr>
+  {% for stu in students %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>
+      {{ stu.full_name }}
+      {% if student_averages and stu.id in student_averages %}
+        <small class="text-muted">— معدل: {{ student_averages|dict_get:stu.id }}</small>
+      {% endif %}
+    </td>
+    <td>
+      {% if student_averages and stu.id in student_averages %}
+        {{ student_averages|dict_get:stu.id }}
+      {% else %}
+        ۰
+      {% endif %}
+    </td>
+    <td class="d-flex gap-2">
+  <a class="btn btn-sm btn-outline-primary" href="{% url 'grades:student_grades' stu.id %}">ویرایش نمرات</a>
+  <a class="btn btn-sm btn-outline-secondary" href="{% url 'grades:gradebook' stu.id %}">دفتر نمره</a>
+  <a class="btn btn-sm btn-outline-info" href="{% url 'grades:edit_student' stu.id %}">ویرایش دانش‌آموز</a>
+      <form method="post" action="{% url 'grades:delete_student' stu.id %}" onsubmit="return confirm('آیا از حذف این دانش‌آموز مطمئن هستید؟');" style="display:inline;">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-outline-danger" type="submit">حذف</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<p><strong>میانگین کل کلاس:</strong> {{ class_avg|default:"۰" }}</p>
+{# Removed invalid 'edit_scores' URL. Use per-student edit links in the table above. #}
+{% if attendances and attendances.exists %}
+  <h3>لیست حضور و غیاب (آخرین‌ها)</h3>
+  <table border="1" cellpadding="5">
+    <tr>
+      <th>تاریخ</th>
+      <th>دانش‌آموز</th>
+      <th>وضعیت</th>
+      <th>عملیات</th>
+    </tr>
+    {% for at in attendances %}
+    <tr>
+  <td>{% if at.date_jalali %}{{ at.date_jalali }}{% else %}{{ at.date }}{% endif %}</td>
+      <td>{{ at.student.full_name }}</td>
+      <td>{% if at.present %}حاضر{% else %}غایب{% endif %}</td>
+      <td>
+        <form method="post" action="{% url 'grades:delete_attendance_entry' at.student.id at.date %}" onsubmit="return confirm('حذف این رکورد حضور/غیاب؟')" style="display:inline;">
+          {% csrf_token %}
+          <button class="btn btn-sm btn-outline-danger">حذف</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p class="text-muted">هیچ ورودی حضور/غیابی برای این کلاس موجود نیست.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,53 @@
+﻿{% extends 'grades/base.html' %}
+{% load static %}\r\n{% load grade_extras %}
+{% block content %}
+<h2>ثبت حضور/غیاب: {{ class.name }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <div style="max-width:300px;margin-bottom:10px;">
+    {{ form.date.label_tag }}
+    {{ form.date }}
+  </div>
+
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>شماره</th>
+      <th>نام</th>
+      <th>حاضر</th>
+    </tr>
+    {% for stu in students %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ stu.full_name }}</td>
+      <td style="text-align:center;">
+        <input type="checkbox" name="present_{{ stu.id }}" {% if existing_map|get_item:stu.id %}checked{% endif %}>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div style="margin-top:10px;">
+    <button class="btn btn-primary" type="submit">ذخیره</button>
+    <a class="btn btn-secondary" href="{% url 'grades:class_detail' class_id=class.id %}">بازگشت</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/behrangja/persian-datepicker@v1.2.0/dist/css/persian-datepicker.min.css" />
+  <script src="https://cdn.jsdelivr.net/gh/behrangja/persian-datepicker@v1.2.0/dist/js/persian-date.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/behrangja/persian-datepicker@v1.2.0/dist/js/persian-datepicker.min.js"></script>
+  <script>
+    $(function(){
+      // initialize persian datepicker on inputs with class 'persian-date'
+      $('.persian-date').each(function(){
+        $(this).persianDatepicker({
+          format: 'YYYY/MM/DD',
+          initialValue: false,
+          autoClose: true
+        });
+      });
+    });
+  </script>
+{% endblock %}

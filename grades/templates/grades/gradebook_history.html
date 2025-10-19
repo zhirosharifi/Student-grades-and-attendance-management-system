@@ -1,0 +1,55 @@
+{% extends 'grades/base.html' %}
+{% block title %}تاریخچه دفتر نمره{% endblock %}
+{% block content %}
+  <div class="panel">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h4 style="margin:0">تاریخچه دفتر نمره</h4>
+      <form method="post" action="{% url 'grades:clear_gradebook_history' %}" onsubmit="return confirm('کل تاریخچه دفتر نمره حذف شود؟');">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger">حذف کل تاریخچه</button>
+      </form>
+    </div>
+    <form method="get" class="row g-2 mb-3">
+      <div class="col-md-6"><input type="text" class="form-control" name="q" placeholder="جستجو نام دانش‌آموز/نام درس" value="{{ request.GET.q }}"></div>
+      <div class="col-md-3">
+        <select class="form-control" name="entry_type">
+          <option value="">همه نوع‌ها</option>
+          <option value="pos" {% if request.GET.entry_type == 'pos' %}selected{% endif %}>مثبت</option>
+          <option value="neg" {% if request.GET.entry_type == 'neg' %}selected{% endif %}>منفی</option>
+          <option value="num" {% if request.GET.entry_type == 'num' %}selected{% endif %}>نمره</option>
+        </select>
+      </div>
+      <div class="col-md-3"><button class="btn btn-primary w-100">فیلتر</button></div>
+    </form>
+
+    {% if items %}
+      <table border="1" cellpadding="5" style="width:100%">
+        <tr>
+          <th>#</th>
+          <th>دانش‌آموز</th>
+          <th>درس</th>
+          <th>نوع</th>
+          <th>مقدار</th>
+          <th>تاریخ</th>
+          <th>زمان آرشیو</th>
+          <th>توضیحات</th>
+        </tr>
+        {% for it in items %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ it.student.full_name }}</td>
+          <td>{% if it.subject %}{{ it.subject.name }}{% else %}-{% endif %}</td>
+          <td>{{ it.get_entry_type_display }}</td>
+          <td>{{ it.value }}</td>
+          <td>{% if it.date_jalali %}{{ it.date_jalali }}{% else %}{{ it.date }}{% endif %}</td>
+          <td>{{ it.archived_at }}</td>
+          <td>{{ it.notes }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <div class="text-muted">موردی یافت نشد.</div>
+    {% endif %}
+  </div>
+{% endblock %}
+
