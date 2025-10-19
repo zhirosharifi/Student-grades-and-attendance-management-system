@@ -75,5 +75,4 @@ A comprehensive **Student Grades and Attendance Management System** built with *
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
-cd algorithm-v2.4.1
+git clone https://github.com/zhirosharifi/Student-grades-and-attendance-management-system.git
